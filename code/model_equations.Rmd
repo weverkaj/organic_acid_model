@@ -1,0 +1,84 @@
+---
+title: "Model code"
+author: "Jacob Weverka"
+date: "2024-07-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ExtDist)
+```
+
+Everything is going to be respresented as a distribution - but in practice everything is displayed discretely so we can just have r show values from continuous density functions at whatever chosen interval
+
+1. C uptake to pyruvate
+
+```{r}
+dP = function(C, #carbon pool
+              P, #pyruvate pool
+              Vu, #max uptake rate
+              Ku, #uptake half-sat
+              r_r, #remobilization rate from glycogen
+              G, #glycogen pool 
+              x, #organism length
+              res, #model spatial resolution
+              r_g, #growth allocation
+              r_c, #citric acid allocation
+              r_s = (1- (r_g + r_c)), #storage allocation
+              beta = 20, alpha = 1 #parameters to constrain spatial distribution
+){
+  require(ExtDist)
+  
+  space = seq(0, x, by = res)
+  
+  dPdt = ((V*Cu)/(C + Ku)) * dBeta_ab(space, shape1 = alpha, shape2 = beta, a = 0, b = x) + r_r * G - (r_g + r_c +r_s) * G
+  
+}
+
+
+```
+
+
+2. Glycogen
+
+```{r}
+
+dG = function(G, 
+              P, 
+              r_s, 
+              r_r, 
+              r_t #tartaric acid production
+              ){
+  
+  dGdt = r_s*P - (r_r + r_t)*G
+  
+  
+}
+
+```
+
+
+3. Tartaric
+
+```{r}
+dZt = function(G, 
+               P, 
+               Zt, #total tartaric acid pool
+               x,
+               k_t, #rate constant for acid nutrient binding
+               Vm, #acid uptake max
+               Km, #acid uptake half-sat
+               q, # carbon to nutrient ratio
+               r_t, #tartaric acid production
+               
+){
+  
+  dZtdt = 
+  
+}
+
+
+```
+
