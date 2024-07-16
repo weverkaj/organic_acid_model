@@ -13,7 +13,7 @@ library(ExtDist)
 
 Everything is going to be respresented as a distribution - but in practice everything is displayed discretely so we can just have r show values from continuous density functions at whatever chosen interval
 
-1. C uptake to pyruvate
+#1. C uptake to pyruvate
 
 ```{r}
 dP = function(C, #carbon pool
@@ -35,13 +35,14 @@ dP = function(C, #carbon pool
   
   dPdt = ((V*Cu)/(C + Ku)) * dBeta_ab(space, shape1 = alpha, shape2 = beta, a = 0, b = x) + r_r * G - (r_g + r_c +r_s) * G
   
+  return(dPdt)
 }
 
 
 ```
+ i9
 
-
-2. Glycogen
+#2. Glycogen
 
 ```{r}
 
@@ -49,36 +50,99 @@ dG = function(G,
               P, 
               r_s, 
               r_r, 
-              r_t #tartaric acid production
+              r_t, #tartaric acid production
+              res
               ){
   
   dGdt = r_s*P - (r_r + r_t)*G
   
+  return(dGdt)
   
 }
 
 ```
 
 
-3. Tartaric
+#3. Tartaric
 
 ```{r}
 dZt = function(G, 
                P, 
                Zt, #total tartaric acid pool
+               Zc, #citric acid pool
                x,
-               k_t, #rate constant for acid nutrient binding
+               k_t, #rate constant for tartaric acid nutrient binding
+               k_c, #rate constant for citric acid nutrient binding
                Vm, #acid uptake max
                Km, #acid uptake half-sat
                q, # carbon to nutrient ratio
                r_t, #tartaric acid production
-               
+               r_g #growth allocation from pyruvate
 ){
   
-  dZtdt = 
+  nl_uptake = (Vm * ((k_t * Zt) + (k_c * Zc))) / ((k_t * Zt) + (k_c * Zc) + Km)
   
+  cl_uptake = (r_g * sum(P))/q
+    
+  
+  dZtdt = r_T * G - (min(nl_uptake, cl_uptake) * (Zt / (Zt + Zc)))
+  
+  return(dZtdt)
 }
 
+
+```
+
+#4. Citric
+
+```{r}
+dZc = function(P,               P, 
+               Zt, #total tartaric acid pool
+               Zc, #citric acid pool
+               x,
+               k_t, #rate constant for tartaric acid nutrient binding
+               k_c, #rate constant for citric acid nutrient binding
+               Vm, #acid uptake max
+               Km, #acid uptake half-sat
+               q, # carbon to nutrient ratio
+               r_t, #tartaric acid production
+               r_g #growth allocation from pyruvate
+){
+  
+  nl_uptake = (Vm * ((k_t * Zt) + (k_c * Zc))) / ((k_t * Zt) + (k_c * Zc) + Km)
+  
+  cl_uptake = (r_g * sum(P))/q
+    
+  
+  dZcdt = r_T * P - (min(nl_uptake, cl_uptake) * (Zc / (Zt + Zc)))
+  
+  return(dZcdt)
+}
+
+
+```
+
+
+# 5. Biomass
+
+```{r}
+
+dFb = function(Zt, #total tartaric acid pool
+               Zc, #citric acid pool
+               x,
+               k_t, #rate constant for tartaric acid nutrient binding
+               k_c, #rate constant for citric acid nutrient binding
+               Vm, #acid uptake max
+               Km, #acid uptake half-sat
+               q, # carbon to nutrient ratio
+               r_t, #tartaric acid production
+               r_g #growth allocation from pyruvate
+    
+  
+  
+){
+  
+}
 
 ```
 
